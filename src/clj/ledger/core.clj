@@ -5,7 +5,8 @@
             [clojure.pprint :as pp]
             [clojure.spec.alpha :as s]
             [clojure.string :as str]
-            [clojure.walk]))
+            [clojure.walk])
+  (:gen-class))
 
 (s/check-asserts true)
 (s/def ::timestamp (s/and int? #(> % (-> 15 (* 1000) (* 1000) (* 100)))))
@@ -34,14 +35,16 @@
 
 
 (defn xe [sym amt]
-  (->> (-> "eur.json"
-           (slurp)
-           (json/read-str)
-           (clojure.walk/keywordize-keys)
-           (:rates)
-           ((keyword (str/upper-case sym))))
-       (/ 1)
-       (* amt)))
+  ;; @todo   xe rates need to be in resources/other, not CWD
+  (let [rate (-> (format "%s/%s" (System/getProperty "user.dir") "eur.json")
+                 (slurp)
+                 (json/read-str)
+                 (clojure.walk/keywordize-keys)
+                 (:rates)
+                 ((keyword (str/upper-case sym))))]
+    (->> rate
+         (/ 1)
+         (* amt))))
 
 (defn recalc [op prev e]
   (op prev (xe (:xe e) (read-string (:amt e)))))
@@ -53,7 +56,7 @@
               (-> (assoc acc credited (recalc + (credited acc 0) e))
                   (assoc debited (recalc + (debited  acc 0) e)))))
           {}
-          (load-ledger fp))))
+          (load-ledger fp)))
 
 (defn record! [fp entry]  
   (s/assert ::entry entry)
