@@ -13,7 +13,7 @@
 (s/def ::xe (s/and #(.contains [ "mkd" "rsd" "bam" "hrk" "eur" "xag" "btc" "xmr" ] %)
                    #(= java.lang.String (type %))
                    #(= 3 (count %))))
-(s/def ::amt #(int? (read-string %)))
+(s/def ::amt #(int? (read-string %))) ;; @todo   fails at float
 (s/def ::debit string?)
 (s/def ::credit string?)
 
@@ -36,6 +36,7 @@
 
 (defn xe [sym amt]
   ;; @todo   xe rates need to be in resources/other, not CWD
+  ;; @todo   xe rates need to be changeable by substituting the json file
   (let [rate (-> (format "%s/%s" (System/getProperty "user.dir") "eur.json")
                  (slurp)
                  (json/read-str)
