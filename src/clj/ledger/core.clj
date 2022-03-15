@@ -13,7 +13,7 @@
 (s/def ::xe (s/and #(.contains [ "mkd" "rsd" "bam" "hrk" "eur" "xag" "btc" "xmr" ] %)
                    #(= java.lang.String (type %))
                    #(= 3 (count %))))
-(s/def ::amt #(int? (read-string %))) ;; @todo   fails at float
+(s/def ::amt #(-> (read-string %) (or (int?) (float?))))
 (s/def ::debit string?)
 (s/def ::credit string?)
 
