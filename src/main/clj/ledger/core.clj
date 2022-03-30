@@ -54,19 +54,19 @@
   (reduce (fn [acc e]
             (let [credited (keyword (:credit e))
                   debited  (keyword (:debit  e))]
-              (-> (assoc acc credited (recalc + (credited acc 0) e))
+              (-> (assoc acc credited (recalc - (credited acc 0) e))
                   (assoc debited (recalc + (debited  acc 0) e)))))
           {}
           (load-ledger fp)))
 
-(defn record! [fp entry]  
+(defn record! [fp entry]
   (s/assert ::entry entry)
   (let [ line (format "%d,%s,%s,%s,%s\n"
                       (:timestamp entry)
                       (:xe entry)
                       (:amt entry)
                       (:debit entry)
-                      (:credit entry "energy")) ]      
+                      (:credit entry "energy")) ]
         (spit fp line :append true))
   (tally fp))
 
