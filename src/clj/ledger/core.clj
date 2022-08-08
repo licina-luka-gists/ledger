@@ -37,13 +37,11 @@
 (defn xe [sym amt]
   ;; @todo   xe rates need to be in resources/other, not CWD
   ;; @todo   xe rates need to be changeable by substituting the json file
-  (let [rate (-> (format "%s/%s" (System/getProperty "user.dir") "eur.json")
-                 (slurp)
-                 (json/read-str)
-                 (clojure.walk/keywordize-keys)
-                 (:rates)
-                 ((keyword (str/upper-case sym))))]
+  ;; @todo   dehardcode the values, read a json file
+  (let [raw "{\"BAM\":\"1,957507\", \"BTC\":\"0,000044\", \"EUR\":\"1\", \"HRK\":\"7,514552\", \"RSD\":\"117,245237\"}"
+        rate (get (json/read-str raw) (str/upper-case sym))]
     (->> rate
+         (read-string)
          (/ 1)
          (* amt))))
 
