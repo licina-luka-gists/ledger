@@ -39,14 +39,11 @@
   ;; @todo   xe rates need to be changeable by substituting the json file
   ;; @todo   dehardcode the values, read a json file
   (let [raw "{\"BAM\":\"1,957507\", \"BTC\":\"0,000044\", \"EUR\":\"1\", \"HRK\":\"7,514552\", \"RSD\":\"117,245237\"}"
-        rate (get (json/read-str raw) (str/upper-case sym))]
-    (->> rate
-         (read-string)
-         (/ 1)
-         (* amt))))
+        rate (read-string (str/replace (get (json/read-str raw) (str/upper-case sym)) #"," "."))]
+    (* amt (/ 1 rate))))
 
 (defn recalc [op prev e]
-  (op prev (xe (:xe e) (read-string (:amt e)))))
+  (float (op prev (xe (:xe e) (read-string (:amt e))))))
 
 (defn tally [fp]
   (reduce (fn [acc e]
